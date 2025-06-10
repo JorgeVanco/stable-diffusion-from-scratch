@@ -83,6 +83,9 @@ class UNetResidualBlock(nn.Module):
 
         feature = self.conv_feature(feature)
 
+        # (1, 1280) -> (1, 1280)
+        t = F.silu(t)
+
         t = self.linear_time(t)
         merged = (
             feature + t[:, :, None, None]
