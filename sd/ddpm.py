@@ -29,10 +29,9 @@ class DDPMSampler:
 
         self.num_training_steps: int = num_training_steps
         self.timesteps: torch.Tensor = torch.from_numpy(
-            np.arange(0, num_training_steps)[::-1]
+            np.arange(0, num_training_steps)[::-1].copy()
         ).long()
         self.num_inference_steps: int
-        self.inference_timesteps: torch.Tensor
         self.start_step: int
 
     def set_inference_steps(self, num_inference_steps: int = 50) -> None:
@@ -49,8 +48,8 @@ class DDPMSampler:
             )
         self.num_inference_steps = num_inference_steps
         step_ratio = self.num_training_steps // num_inference_steps
-        self.inference_timesteps = self.timesteps[::step_ratio]
-        self.inference_timesteps = self.inference_timesteps.to(self.generator.device)
+        self.timesteps = self.timesteps[::step_ratio]
+        self.timesteps = self.timesteps.to(self.generator.device)
 
     def _get_previous_timestep(self, t: int) -> int:
         """
@@ -126,9 +125,9 @@ class DDPMSampler:
 
         # Compute the coefficients for the pred_original_sample and current sample x_t
         pred_original_sample_coeff = (
-            alpha_prod_t.sqrt() * current_beta_t
+            alpha_prod_t_prev.sqrt() * current_beta_t
         ) / beta_prod_t
-        current_sample_coeff = current_alpha_t * beta_prod_t_prev / beta_prod_t
+        current_sample_coeff = current_alpha_t.sqrt() * beta_prod_t_prev / beta_prod_t
 
         # Compute the predicted previous sample mean
         pred_prev_sample = (
