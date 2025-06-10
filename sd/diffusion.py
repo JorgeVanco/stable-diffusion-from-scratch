@@ -114,7 +114,7 @@ class UNetAttentionBlock(nn.Module):
             n_head, channels, context_dim, in_proj_bias=False
         )
         self.layernorm_3 = nn.LayerNorm(channels)
-        self.linear_geglu_1 = nn.Linear(channels, channels * 4)
+        self.linear_geglu_1 = nn.Linear(channels, 2 * channels * 4)
         self.linear_geglu_2 = nn.Linear(channels * 4, channels)
 
         self.conv_output = nn.Conv2d(channels, channels, kernel_size=1, padding=0)
@@ -312,13 +312,44 @@ class UNet(nn.Module):
                     UNetResidualBlock(960, 320), UNetAttentionBlock(8, 40)
                 ),
                 SwitchSequential(
-                    UNetResidualBlock(640, 320), UNetAttentionBlock(8, 80)
+                    UNetResidualBlock(640, 320), UNetAttentionBlock(8, 40)
                 ),
                 SwitchSequential(
                     UNetResidualBlock(640, 320), UNetAttentionBlock(8, 40)
                 ),
             ]
         )
+
+    def forward(
+        self, latent: torch.Tensor, context: torch.Tensor, t: torch.Tensor
+    ) -> torch.Tensor:
+        """
+        Forward pass through the UNet architecture.
+        Args:
+            latent (torch.Tensor): Input latent tensor with shape (Batch_size, 4, Height / 8, Width / 8).
+            context (torch.Tensor): Context tensor with shape (Batch_size, Sequence_Length, Dim).
+            t (torch.Tensor): Time step tensor with shape (1, 1280).
+        Returns:
+            torch.Tensor: Output tensor with shape (Batch_size, 320, Height / 8, Width / 8).
+        """
+        # latent: (Batch_size, 4, Height / 8, Width / 8)
+        # context: (Batch_size, Sequence_Length, Dim)
+        # t: (1, 1280)
+        skip_connections: list[torch.Tensor] = []
+        # Encoder
+        for layer in self.encoders:
+            latent = layer(latent, context, t)
+            skip_connections.append(latent)
+
+        # Bottleneck
+        latent = self.bottleneck(latent, context, t)
+
+        # Decoder
+        for layer in self.decoders:
+            latent = torch.cat((latent, skip_connections.pop()), dim=1)
+            latent = layer(latent, context, t)
+
+        return latent
 
 
 class UNetOutputLayer(nn.Module):
