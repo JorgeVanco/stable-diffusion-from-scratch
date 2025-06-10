@@ -148,13 +148,13 @@ def generate(
         for i, t in enumerate(timesteps):
             time_embedding = get_time_embedding(t).to(device)
 
-            model_input = latents
+            model_input = latents.clone()
             if do_cfg:
                 # (Batch_size, Channels, Height, Width) -> (Batch_size * 2, Channels, Height, Width)
                 model_input = model_input.repeat(2, 1, 1, 1)
 
             # model_output is the predicted noise by the UNet
-            model_output = diffusion(model_input, context, time_embedding)
+            model_output: torch.Tensor = diffusion(model_input, context, time_embedding)
 
             if do_cfg:
                 output_cond, output_uncond = model_output.chunk(2, dim=0)
@@ -213,5 +213,5 @@ def get_time_embedding(timestep: torch.Tensor) -> torch.Tensor:
         -np.log(10000) * torch.arange(0, half_dim, dtype=torch.float32) / half_dim
     )
     emb = torch.tensor([timestep], dtype=torch.float32)[:, None] * emb[None, :]
-    emb = torch.cat([emb.sin(), emb.cos()], dim=-1)
+    emb = torch.cat([emb.cos(), emb.sin()], dim=-1)
     return emb
