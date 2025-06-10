@@ -65,11 +65,13 @@ def generate(
                 [prompt],
                 padding="max_length",
                 max_length=77,
+                truncation=True,
             ).input_ids
             uncond_tokens = tokenizer.batch_encode_plus(
                 [uncond_prompt],
                 padding="max_length",
                 max_length=77,
+                truncation=True,
             ).input_ids
 
             # (Batch_size, Sequence_length) -> (Batch_size, Sequence_length)
