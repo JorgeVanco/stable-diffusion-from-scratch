@@ -16,6 +16,10 @@ class VAE_AttentionBlock(nn.Module):
         """Forward pass through the attention block."""
         # x: (Batch_size, In_Channels, Height, Width)
         residue = x
+
+        # (Batch_size, In_Channels, Height, Width) -> (Batch_size, In_Channels, Height, Width)
+        x = self.group_norm(x)
+
         b, c, h, w = x.shape
 
         # (Batch_size, In_Channels, Height, Width) -> (Batch_size, In_Channels, Height * Width)
