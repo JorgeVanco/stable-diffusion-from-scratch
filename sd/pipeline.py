@@ -41,7 +41,7 @@ def generate(
         idle_device (str | None): The device to use for idle tensors.
         tokenizer: The tokenizer to use for text encoding.
     """
-    with torch.no_grad():
+    with torch.inference_mode():
         if not (0 < strength <= 1):
             raise ValueError("Strength must be in the range (0, 1]")
 

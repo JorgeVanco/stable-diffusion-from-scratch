@@ -68,3 +68,21 @@ Below are the performance measurements for various optimization approaches:
 
 **Self CPU time total: 261.921s**  
 **Self CUDA time total: 251.978s**
+
+### Fourth Run (using torch.inference_mode instead of torch.no_grad)
+
+| Name                                               | Self CPU % | Self CPU    | CPU total % | CPU total  | CPU time avg | Self CUDA  | Self CUDA % | CUDA total | CUDA time avg | # of Calls |
+| -------------------------------------------------- | ---------- | ----------- | ----------- | ---------- | ------------ | ---------- | ----------- | ---------- | ------------- | ---------- |
+| model_inference                                    | 0.00%      | 0.000us     | 0.00%       | 0.000us    | 0.000us      | 202.237s   | 106.04%     | 202.237s   | 101.119s      | 2          |
+| model_inference                                    | 0.08%      | 164.374ms   | 100.00%     | 202.247s   | 202.247s     | 0.000us    | 0.00%       | 191.259s   | 191.259s      | 1          |
+| Torch-Compiled Region: 1/0                         | 0.52%      | 1.060s      | 4.38%       | 8.853s     | 177.065ms    | 580.683ms  | 0.30%       | 183.095s   | 3.662s        | 50         |
+| aten::bmm                                          | 0.06%      | 115.354ms   | 0.09%       | 178.184ms  | 54.110us     | 87.487s    | 45.87%      | 87.975s    | 26.716ms      | 3293       |
+| triton_red_fused__softmax_14                       | 0.00%      | 3.362ms     | 0.00%       | 8.194ms    | 32.774us     | 47.738s    | 25.03%      | 47.738s    | 190.952ms     | 250        |
+| triton_red_fused__softmax_14                       | 0.00%      | 0.000us     | 0.00%       | 0.000us    | 0.000us      | 47.738s    | 25.03%      | 47.738s    | 190.952ms     | 250        |
+| void cutlass::Kernel2<cutlass_80_tensorop_s1688gemm_... | 0.00% | 0.000us     | 0.00%       | 0.000us    | 0.000us      | 45.985s    | 24.11%      | 45.985s    | 76.642ms      | 600        |
+| void cutlass::Kernel2<cutlass_80_tensorop_s1688gemm_... | 0.00% | 0.000us     | 0.00%       | 0.000us    | 0.000us      | 41.272s    | 21.64%      | 41.272s    | 41.272ms      | 1000       |
+| aten::mm                                           | 0.13%      | 262.772ms   | 0.23%       | 461.871ms  | 59.727us     | 30.027s    | 15.74%      | 30.031s    | 3.884ms       | 7733       |
+| aten::convolution                                  | 0.04%      | 78.898ms    | 2.47%       | 4.986s     | 988.545us    | 0.000us    | 0.00%       | 14.596s    | 2.894ms       | 5044       |
+
+**Self CPU time total: 202.247s**  
+**Self CUDA time total: 190.709s**
