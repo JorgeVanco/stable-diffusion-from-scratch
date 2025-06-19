@@ -40,19 +40,19 @@ class SelfAttention(nn.Module):
         q, k, v = self.in_proj(x).chunk(
             3, dim=-1
         )  # q,k,v shape: [batch_size, seq_len, embed_dim]
-        
-        output = F.scaled_dot_product_attention(q, k, v, dropout_p=0.0, is_causal=causal_mask)
 
-        # # Reshape q, k, v to separate the heads and then transpose to get dimensions:
-        # q = q.view(intermidiate_shape).transpose(
-        #     1, 2
-        # )  # [batch_size, num_heads, seq_len, head_dim]
-        # k = k.view(intermidiate_shape).transpose(
-        #     1, 2
-        # )  # [batch_size, num_heads, seq_len, head_dim]
-        # v = v.view(intermidiate_shape).transpose(
-        #     1, 2
-        # )  # [batch_size, num_heads, seq_len, head_dim]
+        # Reshape q, k, v to separate the heads and then transpose to get dimensions:
+        q = q.view(intermidiate_shape).transpose(
+            1, 2
+        )  # [batch_size, num_heads, seq_len, head_dim]
+        k = k.view(intermidiate_shape).transpose(
+            1, 2
+        )  # [batch_size, num_heads, seq_len, head_dim]
+        v = v.view(intermidiate_shape).transpose(
+            1, 2
+        )  # [batch_size, num_heads, seq_len, head_dim]
+
+        output = F.scaled_dot_product_attention(q, k, v, dropout_p=0.0, is_causal=causal_mask)
 
         # # Calculate attention scores: [batch_size, num_heads, seq_len, seq_len]
         # weight = q @ k.transpose(-2, -1)  # Matrix multiply q with k^T
@@ -116,18 +116,19 @@ class CrossAttention(nn.Module):
         q = self.q_proj(x)
         k = self.k_proj(y)
         v = self.v_proj(y)
+        q = q.view(intermidiate_shape).transpose(
+            1, 2
+        )  # [batch_size, num_heads, seq_len_Q, head_dim]
+        k = k.view(intermidiate_shape).transpose(
+            1, 2
+        )  # [batch_size, num_heads, cross_seq_len_KV, head_dim]
+        v = v.view(intermidiate_shape).transpose(
+            1, 2
+        )  # [batch_size, num_heads, cross_seq_len_KV, head_dim]
+        
         output = F.scaled_dot_product_attention(
             q, k, v, dropout_p=0.0, is_causal=False
         )
-        # q = q.view(intermidiate_shape).transpose(
-        #     1, 2
-        # )  # [batch_size, num_heads, seq_len_Q, head_dim]
-        # k = k.view(intermidiate_shape).transpose(
-        #     1, 2
-        # )  # [batch_size, num_heads, cross_seq_len_KV, head_dim]
-        # v = v.view(intermidiate_shape).transpose(
-        #     1, 2
-        # )  # [batch_size, num_heads, cross_seq_len_KV, head_dim]
 
         # weight = q @ k.transpose(
         #     -2, -1
@@ -135,6 +136,7 @@ class CrossAttention(nn.Module):
         # weight /= math.sqrt(self.head_dim)
         # weight = F.softmax(weight, dim=-1)
         # output = weight @ v
+        
         output = output.transpose(1, 2).contiguous().view(input_shape)
         output = self.out_proj(output)
         return output
