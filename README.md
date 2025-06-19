@@ -1,4 +1,4 @@
-Initial run:
+### Initial run:
 
 | Name                    | Self CPU % | Self CPU  | CPU total % | CPU total | CPU time avg | Self CUDA | Self CUDA % | CUDA total | CUDA time avg | # of Calls |
 | ----------------------- | ---------- | --------- | ----------- | --------- | ------------ | --------- | ----------- | ---------- | ------------- | ---------- |
@@ -13,5 +13,23 @@ Initial run:
 | aten::\_softmax         | 0.03%      | 137.067ms | 0.03%       | 137.067ms | 84.349us     | 107.180s  | 23.03%      | 107.180s   | 65.957ms      | 1625       |
 | aten::div\_             | 0.02%      | 110.778ms | 0.02%       | 110.778ms | 68.129us     | 62.728s   | 13.48%      | 62.728s    | 38.578ms      | 1626       |
 
-Self CPU time total: 465.392s  
-Self CUDA time total: 465.378s
+**Self CPU time total: 465.392s**  
+**Self CUDA time total: 465.378s**
+
+### Second Run (with torch.compile):
+
+| Name                                                   | Self CPU % | Self CPU    | CPU total % | CPU total  | CPU time avg | Self CUDA   | Self CUDA % | CUDA total  | CUDA time avg | # of Calls |
+| ------------------------------------------------------ | ---------- | ----------- | ----------- | ---------- | ------------ | ----------- | ----------- | ----------- | ------------- | ---------- |
+| model_inference                                        | 0.00%      | 0.000us     | 0.00%       | 0.000us    | 0.000us      | 256.105s    | 130.68%     | 256.105s    | 128.053s      | 2          |
+| model_inference                                        | 0.05%      | 131.109ms   | 100.00%     | 256.110s   | 256.110s     | 0.000us     | 0.00%       | 200.049s    | 200.049s      | 1          |
+| Torch-Compiled Region: 1/0                             | 0.41%      | 1.047s      | 5.43%       | 13.910s    | 278.200ms    | 3.581s      | 1.83%       | 181.936s    | 3.639s        | 50         |
+| aten::bmm                                              | 0.16%      | 412.788ms   | 0.22%       | 552.780ms  | 103.459us    | 88.105s     | 44.96%      | 88.126s     | 16.494ms      | 5343       |
+| triton_red_fused__softmax_14                           | 0.00%      | 3.062ms     | 0.00%       | 7.117ms    | 28.469us     | 47.684s     | 24.33%      | 47.684s     | 190.734ms     | 250        |
+| triton_red_fused__softmax_14                           | 0.00%      | 0.000us     | 0.00%       | 0.000us    | 0.000us      | 47.684s     | 24.33%      | 47.684s     | 190.734ms     | 250        |
+| void cutlass::Kernel2<cutlass_80_tensorop_s1688gemm_... | 0.00%      | 0.000us     | 0.00%       | 0.000us    | 0.000us      | 45.974s     | 23.46%      | 45.974s     | 38.569ms      | 1192       |
+| void cutlass::Kernel2<cutlass_80_tensorop_s1688gemm_... | 0.00%      | 0.000us     | 0.00%       | 0.000us    | 0.000us      | 41.612s     | 21.23%      | 41.612s     | 39.036ms      | 1066       |
+| aten::mm                                               | 0.25%      | 632.716ms   | 0.37%       | 936.869ms  | 102.200us    | 23.480s     | 11.98%      | 23.495s     | 2.563ms       | 9167       |
+| aten::convolution                                      | 0.25%      | 645.138ms   | 1.29%       | 3.297s     | 528.088us    | 0.000us     | 0.00%       | 14.923s     | 2.390ms       | 6244       |
+
+**Self CPU time total: 256.110s**  
+**Self CUDA time total: 195.978s**
