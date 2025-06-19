@@ -119,10 +119,11 @@ Below are the performance measurements for various optimization approaches:
 | aten::mm                                        | 0.29%      | 284.905ms | 0.52%        | 499.538ms  | 64.565us       | 6.585s     | 7.72%         | 6.585s      | 851.102us       | 7737        |
 | aten::convolution                               | 0.08%      | 79.102ms  | 1.55%        | 1.495s     | 296.430us      | 0.000us    | 0.00%         | 6.406s      | 1.270ms         | 5044        |
 
-**Self CPU time total: 96.672s**
+**Self CPU time total: 96.672s**  
 **Self CUDA time total: 85.332s**
 
 ### Sixth Run (Using pytorch FlashAttention with bloat16)
+**Inference in under a minute!!!**
 
 | Name                                                    | Self CPU % | Self CPU   | CPU total % | CPU total  | CPU time avg | Self CUDA  | Self CUDA % | CUDA total | CUDA time avg | # of Calls |
 |---------------------------------------------------------|------------|------------|-------------|------------|---------------|------------|--------------|-------------|----------------|-------------|
@@ -137,5 +138,5 @@ Below are the performance measurements for various optimization approaches:
 | aten::fill_                                             | 0.36%      | 341.773ms  | 1.18%       | 1.109s     | 17.078us      | 6.699s     | 19.31%       | 6.703s      | 103.204us      | 64949       |
 | void at::native::vectorized_elementwise_kernel<4, at... | 0.00%      | 0.000us    | 0.00%       | 0.000us    | 0.000us       | 6.699s     | 19.31%       | 6.699s      | 103.147us      | 64949       |
 
-**Self CPU time total: 93.968s**
+**Self CPU time total: 93.968s**  
 **Self CUDA time total: 34.694s**
