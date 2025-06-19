@@ -51,7 +51,7 @@ Below are the performance measurements for various optimization approaches:
 
 ### Third Run (using pytorch FlashAttention)
 
-> For some reason it performs worst, I have to look into it
+> For some reason it performs worst, I have to look into it. Maybe because it is using float32.
 
 | Name | Self CPU % | Self CPU | CPU total % | CPU total | CPU time avg | Self CUDA | Self CUDA % | CUDA total | CUDA time avg | # of Calls |
 | ---------------------------------------------- | ---------- | ----------- | ----------- | ---------- | ------------ | ---------- | ----------- | ---------- | ------------- | ---------- |
@@ -121,3 +121,21 @@ Below are the performance measurements for various optimization approaches:
 
 **Self CPU time total: 96.672s**
 **Self CUDA time total: 85.332s**
+
+### Sixth Run (Using pytorch FlashAttention with bloat16)
+
+| Name                                                    | Self CPU % | Self CPU   | CPU total % | CPU total  | CPU time avg | Self CUDA  | Self CUDA % | CUDA total | CUDA time avg | # of Calls |
+|---------------------------------------------------------|------------|------------|-------------|------------|---------------|------------|--------------|-------------|----------------|-------------|
+| model_inference                                         | 0.00%      | 0.000us    | 0.00%       | 0.000us    | 0.000us       | 93.961s    | 270.83%      | 93.961s     | 46.980s        | 2           |
+| model_inference                                         | 0.16%      | 146.259ms  | 100.00%     | 93.968s    | 93.968s       | 0.000us    | 0.00%        | 35.056s     | 35.056s        | 1           |
+| Torch-Compiled Region: 1/0                              | 0.95%      | 891.482ms  | 11.65%      | 10.943s    | 218.856ms     | 3.115s     | 8.98%        | 20.925s     | 418.491ms      | 50          |
+| InductorBenchmarker.benchmark_gpu (dynamo_timed)        | 0.00%      | 0.000us    | 0.00%       | 0.000us    | 0.000us       | 20.242s    | 58.35%       | 20.242s     | 55.764ms       | 363         |
+| Torch-Compiled Region: 2/0                              | 0.03%      | 30.361ms   | 14.19%      | 13.331s    | 13.331s       | 9.849s     | 28.39%       | 12.840s     | 12.840s        | 1           |
+| CachingAutotuner.benchmark_all_configs (dynamo_timed...)| 0.19%      | 174.454ms  | 22.95%      | 21.570s    | 209.413ms     | 0.000us    | 0.00%        | 6.794s      | 65.958ms       | 103         |
+| InductorBenchmarker.benchmark_gpu (dynamo_timed)        | 2.74%      | 2.576s     | 22.77%      | 21.395s    | 58.940ms      | 0.000us    | 0.00%        | 6.794s      | 18.715ms       | 363         |
+| aten::zero_                                             | 0.42%      | 398.503ms  | 1.60%       | 1.508s     | 21.568us      | 0.000us    | 0.00%        | 6.703s      | 95.887us       | 69905       |
+| aten::fill_                                             | 0.36%      | 341.773ms  | 1.18%       | 1.109s     | 17.078us      | 6.699s     | 19.31%       | 6.703s      | 103.204us      | 64949       |
+| void at::native::vectorized_elementwise_kernel<4, at... | 0.00%      | 0.000us    | 0.00%       | 0.000us    | 0.000us       | 6.699s     | 19.31%       | 6.699s      | 103.147us      | 64949       |
+
+**Self CPU time total: 93.968s**
+**Self CUDA time total: 34.694s**

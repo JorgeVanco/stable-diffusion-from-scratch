@@ -8,7 +8,7 @@ from torch.profiler import profile, record_function, ProfilerActivity
 
 torch.set_float32_matmul_precision('high')
 # torch.backends.cuda.sdp_kernel(enable_flash=True, enable_math=False, enable_mem_efficient=False)
-DTYPE = torch.bfloat16  # Ensure float16 precision for matmul
+DTYPE = torch.bfloat16
 
 DEVICE = "cpu"
 ALLOW_CUDA = True
