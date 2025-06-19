@@ -1,3 +1,18 @@
+# Stable Diffusion Performance Analysis
+
+This repository contains performance measurements for Stable Diffusion model inference on an NVIDIA GeForce RTX 4060 GPU.
+
+## System Specifications
+```
+NVIDIA GeForce RTX 4060
+VRAM: 8GB GDDR6
+Driver Version: 576.52
+CUDA Version: 12.9
+```
+
+## Performance Benchmarks
+Below are the performance measurements for various optimization approaches:
+
 ### Initial run:
 
 | Name                    | Self CPU % | Self CPU  | CPU total % | CPU total | CPU time avg | Self CUDA | Self CUDA % | CUDA total | CUDA time avg | # of Calls |
