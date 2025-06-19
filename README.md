@@ -86,3 +86,38 @@ Below are the performance measurements for various optimization approaches:
 
 **Self CPU time total: 202.247s**  
 **Self CUDA time total: 190.709s**
+
+### Fifth Run (using bfloat16 precision instead of float32)
+
+| Name                                               | Self CPU % | Self CPU    | CPU total % | CPU total  | CPU time avg | Self CUDA  | Self CUDA % | CUDA total | CUDA time avg | # of Calls |
+| -------------------------------------------------- | ---------- | ----------- | ----------- | ---------- | ------------ | ---------- | ----------- | ---------- | ------------- | ---------- |
+| model_inference                                    | 0.00%      | 0.000us     | 0.00%       | 0.000us    | 0.000us      | 91.781s    | 113.64%     | 91.781s    | 45.890s       | 2          |
+| model_inference                                    | 0.15%      | 140.575ms   | 100.00%     | 91.789s    | 91.789s      | 0.000us    | 0.00%       | 81.191s    | 81.191s       | 1          |
+| Torch-Compiled Region: 1/0                         | 1.18%      | 1.079s      | 6.73%       | 6.179s     | 123.583ms    | 594.311ms  | 0.74%       | 79.900s    | 1.598s        | 50         |
+| aten::bmm                                          | 1.01%      | 928.399ms   | 1.08%       | 992.944ms  | 301.532us    | 42.739s    | 52.92%      | 43.059s    | 13.076ms      | 3293       |
+| triton_red_fused__softmax_14                       | 0.00%      | 3.608ms     | 0.01%       | 8.074ms    | 32.296us     | 23.096s    | 28.60%      | 23.096s    | 92.386ms      | 250        |
+| triton_red_fused__softmax_14                       | 0.00%      | 0.000us     | 0.00%       | 0.000us    | 0.000us      | 23.096s    | 28.60%      | 23.096s    | 92.386ms      | 250        |
+| void cutlass::Kernel2<cutlass_80_tensorop_bf16_s1681... | 0.00% | 0.000us     | 0.00%       | 0.000us    | 0.000us      | 22.576s    | 27.95%      | 22.576s    | 45.151ms      | 500        |
+| ampere_bf16_s1688gemm_bf16_128x128_ldg8_f2f_stages_3... | 0.00% | 0.000us     | 0.00%       | 0.000us    | 0.000us      | 20.101s    | 24.89%      | 20.101s    | 20.081ms      | 1001       |
+| aten::mm                                           | 0.29%      | 263.086ms   | 0.48%       | 439.652ms  | 56.825us     | 6.742s     | 8.35%       | 6.743s     | 871.483us     | 7737       |
+| aten::convolution                                  | 0.24%      | 224.165ms   | 1.45%       | 1.327s     | 263.000us    | 0.000us    | 0.00%       | 3.125s     | 619.592us     | 5044       |
+
+**Self CPU time total: 91.789s**  
+**Self CUDA time total: 80.765s**
+
+### Sixth Run (using float16 precision instead of float32)
+| Name                                            | Self CPU % | Self CPU  | CPU total % | CPU total | CPU time avg | Self CUDA | Self CUDA % | CUDA total | CUDA time avg | # of Calls |
+|-------------------------------------------------|------------|-----------|--------------|------------|----------------|------------|---------------|-------------|----------------|-------------|
+| model_inference                                 | 0.00%      | 0.000us   | 0.00%        | 0.000us    | 0.000us        | 96.659s    | 113.27%       | 96.659s     | 48.330s         | 2           |
+| model_inference                                 | 0.16%      | 159.394ms | 100.00%      | 96.672s    | 96.672s        | 0.000us    | 0.00%         | 85.829s     | 85.829s         | 1           |
+| Torch-Compiled Region: 1/0                      | 1.28%      | 1.234s    | 7.02%        | 6.789s     | 135.773ms      | 505.302ms | 0.59%         | 84.343s     | 1.687s          | 50          |
+| aten::bmm                                       | 1.05%      | 1.013s    | 1.12%        | 1.080s     | 327.956us      | 45.040s    | 52.78%        | 45.453s     | 13.803ms        | 3293        |
+| void cutlass::Kernel2<cutlass_80_tensorop_f16_s16816...| 0.00%      | 0.000us   | 0.00%        | 0.000us    | 0.000us        | 23.715s    | 27.79%        | 23.715s     | 94.859ms        | 250         |
+| triton_red_fused__softmax_14                   | 0.00%      | 3.748ms   | 0.01%        | 8.529ms    | 34.116us       | 23.662s    | 27.73%        | 23.662s     | 94.647ms        | 250         |
+| triton_red_fused__softmax_14                   | 0.00%      | 0.000us   | 0.00%        | 0.000us    | 0.000us        | 23.662s    | 27.73%        | 23.662s     | 94.647ms        | 250         |
+| ampere_fp16_s16816gemm_fp16_128x64_ldg8_f2f_nn  | 0.00%      | 0.000us   | 0.00%        | 0.000us    | 0.000us        | 21.127s    | 24.76%        | 21.127s     | 84.510ms        | 250         |
+| aten::mm                                        | 0.29%      | 284.905ms | 0.52%        | 499.538ms  | 64.565us       | 6.585s     | 7.72%         | 6.585s      | 851.102us       | 7737        |
+| aten::convolution                               | 0.08%      | 79.102ms  | 1.55%        | 1.495s     | 296.430us      | 0.000us    | 0.00%         | 6.406s      | 1.270ms         | 5044        |
+
+**Self CPU time total: 96.672s**
+**Self CUDA time total: 85.332s**

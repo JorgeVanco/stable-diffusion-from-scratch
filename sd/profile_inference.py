@@ -7,6 +7,8 @@ import torch
 from torch.profiler import profile, record_function, ProfilerActivity
 
 torch.set_float32_matmul_precision('high')
+# torch.backends.cuda.sdp_kernel(enable_flash=True, enable_math=False, enable_mem_efficient=False)
+DTYPE = torch.bfloat16  # Ensure float16 precision for matmul
 
 DEVICE = "cpu"
 ALLOW_CUDA = True
@@ -20,7 +22,7 @@ print(f"Using device: {DEVICE}")
 
 tokenizer = CLIPTokenizer("../data/vocab.json", "../data/merges.txt")
 model_file = "../data/v1-5-pruned-emaonly.ckpt"
-models = model_loader.preload_models_from_standard_weights(model_file, device=DEVICE)
+models = model_loader.preload_models_from_standard_weights(model_file, device=DEVICE, dtype=DTYPE)
 
 ## Text to image
 

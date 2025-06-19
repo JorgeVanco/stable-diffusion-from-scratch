@@ -8,6 +8,8 @@ HEIGHT = 512
 LATENTS_WIDTH = WIDTH // 8
 LATENTS_HEIGHT = HEIGHT // 8
 
+DTYPE = torch.bfloat16  # Data type for model weights and computations
+
 
 def generate(
     prompt: str,
@@ -116,7 +118,7 @@ def generate(
 
             input_image_tensor = input_image.resize((WIDTH, HEIGHT))
             input_image_tensor = torch.tensor(
-                input_image_tensor, dtype=torch.float32, device=device
+                input_image_tensor, dtype=DTYPE, device=device
             )
 
             input_image_tensor = rescale(input_image_tensor, (0, 255), (-1, 1))
@@ -127,7 +129,7 @@ def generate(
             input_image_tensor = input_image_tensor.permute(0, 3, 1, 2)
 
             encoder_noise = torch.randn(
-                latents_shape, dtype=torch.float32, device=device, generator=generator
+                latents_shape, dtype=DTYPE, device=device, generator=generator
             )
             # Run the image through the encoder of the VAE
             latents = encoder(input_image_tensor, encoder_noise)
@@ -140,7 +142,7 @@ def generate(
         else:
             # If we are doing text-to-image generation, we need to sample random noise from N(0, I)
             latents = torch.randn(
-                latents_shape, dtype=torch.float32, device=device, generator=generator
+                latents_shape, dtype=DTYPE, device=device, generator=generator
             )
 
         diffusion = models["diffusion"]
@@ -212,8 +214,8 @@ def get_time_embedding(timestep: torch.Tensor) -> torch.Tensor:
     """
     half_dim = 160
     emb = torch.exp(
-        -np.log(10000) * torch.arange(0, half_dim, dtype=torch.float32) / half_dim
+        -np.log(10000) * torch.arange(0, half_dim, dtype=DTYPE) / half_dim
     )
-    emb = torch.tensor([timestep], dtype=torch.float32)[:, None] * emb[None, :]
+    emb = torch.tensor([timestep], dtype=DTYPE)[:, None] * emb[None, :]
     emb = torch.cat([emb.cos(), emb.sin()], dim=-1)
     return emb
