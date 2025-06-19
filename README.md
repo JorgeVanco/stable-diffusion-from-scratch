@@ -33,3 +33,21 @@
 
 **Self CPU time total: 256.110s**  
 **Self CUDA time total: 195.978s**
+
+### Third Run (using pytorch FlashAttention)
+
+| Name                                                   | Self CPU % | Self CPU    | CPU total % | CPU total  | CPU time avg | Self CUDA   | Self CUDA % | CUDA total  | CUDA time avg | # of Calls |
+| ------------------------------------------------------ | ---------- | ----------- | ----------- | ---------- | ------------ | ----------- | ----------- | ----------- | ------------- | ---------- |
+| model_inference                                        | 0.00%      | 0.000us     | 0.00%       | 0.000us    | 0.000us      | 169.153s    | 161.10%     | 169.153s    | 84.576s       | 2          |
+| model_inference                                        | 0.08%      | 135.853ms   | 100.00%     | 169.166s   | 169.166s     | 0.000us     | 0.00%       | 105.270s    | 105.270s      | 1          |
+| Torch-Compiled Region: 1/0                             | 0.61%      | 1.037s      | 8.40%       | 14.211s    | 284.212ms    | 3.952s      | 3.76%       | 54.988s     | 1.100s        | 50         |
+| InductorBenchmarker.benchmark_gpu (dynamo_timed)       | 0.00%      | 0.000us     | 0.00%       | 0.000us    | 0.000us      | 52.855s     | 50.34%      | 52.855s     | 120.126ms     | 440        |
+| Torch-Compiled Region: 2/0                             | 0.02%      | 26.273ms    | 27.77%      | 46.973s    | 46.973s      | 37.211s     | 35.44%      | 46.642s     | 46.642s       | 1          |
+| aten::mm                                               | 0.35%      | 600.125ms   | 0.53%       | 888.909ms  | 101.962us    | 28.612s     | 27.25%      | 28.616s     | 3.282ms       | 8718       |
+| aten::convolution                                      | 0.37%      | 621.182ms   | 1.01%       | 1.712s     | 274.219us    | 0.000us     | 0.00%       | 13.935s     | 2.232ms       | 6244       |
+| aten::_convolution                                     | 0.03%      | 43.885ms    | 0.53%       | 888.199ms  | 179.943us    | 0.000us     | 0.00%       | 13.935s     | 2.823ms       | 4936       |
+| aten::cudnn_convolution                                | 0.31%      | 525.592ms   | 0.50%       | 844.314ms  | 171.052us    | 13.830s     | 13.17%      | 13.935s     | 2.823ms       | 4936       |
+| triton_poi_fused_convolution_native_group_norm_silu_... | 0.00%      | 0.000us     | 0.00%       | 0.000us    | 0.000us      | 10.784s     | 10.27%      | 10.784s     | 250.800ms     | 43         |
+
+**Self CPU time total: 169.166s**  
+**Self CUDA time total: 104.996s**
