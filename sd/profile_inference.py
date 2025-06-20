@@ -37,8 +37,9 @@ image_path = "../images/dog.jpg"
 # input_image = Image.open(image_path).convert("RGB")
 strength = 0.9
 
-sampler_name = "ddpm"
+sampler_name = "ddim"
 num_inference_steps = 50
+ddim_eta = 0.0
 seed = 42
 
 with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA], record_shapes=True) as prof:
@@ -56,7 +57,8 @@ with profile(activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA], record_sh
             seed=seed,
             device=DEVICE,
             tokenizer=tokenizer,
-            idle_device="cpu"
+            idle_device="cpu",
+            ddim_eta=ddim_eta,
         )
         
 print(prof.key_averages().table(sort_by="cuda_time_total", row_limit=10))

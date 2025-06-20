@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 from tqdm import tqdm
-from ddpm import DDPMSampler
+from samplers import DDPMSampler, DDIMSampler
 
 WIDTH = 512
 HEIGHT = 512
@@ -25,6 +25,7 @@ def generate(
     device: str | None = None,
     idle_device: str | None = None,
     tokenizer=None,
+    ddim_eta: float = 0.0,  # Eta for DDIM sampling
 ) -> torch.Tensor:
     """
     Generate an image from a text prompt using a diffusion model.
@@ -106,6 +107,9 @@ def generate(
 
         if sampler_name == "ddpm":
             sampler = DDPMSampler(generator)
+            sampler.set_inference_steps(n_inference_steps)
+        elif sampler_name == "ddim":
+            sampler = DDIMSampler(generator, ddim_eta=ddim_eta)
             sampler.set_inference_steps(n_inference_steps)
         else:
             raise ValueError(f"Unknown sampler: {sampler_name}")

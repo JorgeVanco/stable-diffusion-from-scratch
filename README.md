@@ -123,19 +123,36 @@ Below are the performance measurements for various optimization approaches:
 **Self CUDA time total: 85.332s**
 
 ### Sixth Run (Using pytorch FlashAttention with bloat16)
+| Name                                               | Self CPU % | Self CPU    | CPU total % | CPU total  | CPU time avg | Self CUDA  | Self CUDA % | CUDA total | CUDA time avg | # of Calls |
+|----------------------------------------------------|------------|-------------|-------------|------------|--------------|------------|-------------|------------|--------------|------------|
+| model_inference                                    | 0.00%      | 0.000us     | 0.00%       | 0.000us    | 0.000us      | 24.550s    | 153.96%     | 24.550s    | 12.275s      | 2          |
+| model_inference                                    | 0.53%      | 131.362ms   | 100.00%     | 24.556s    | 24.556s      | 0.000us    | 0.00%       | 16.150s    | 16.150s      | 1          |
+| Torch-Compiled Region: 1/0                         | 3.46%      | 850.092ms   | 17.13%      | 4.206s     | 84.118ms     | 616.743ms  | 3.87%       | 14.695s    | 293.894ms    | 50         |
+| aten::mm                                           | 0.97%      | 237.467ms   | 1.65%       | 404.469ms  | 52.277us     | 6.541s     | 41.02%      | 6.542s     | 845.541us    | 7737       |
+| aten::convolution                                  | 0.28%      | 68.156ms    | 3.88%       | 951.761ms  | 188.692us    | 0.000us    | 0.00%       | 2.512s     | 498.016us    | 5044       |
+| aten::_convolution                                 | 0.25%      | 60.382ms    | 3.51%       | 861.912ms  | 174.618us    | 0.000us    | 0.00%       | 2.512s     | 508.913us    | 4936       |
+| aten::cudnn_convolution                            | 1.55%      | 381.320ms   | 3.26%       | 801.530ms  | 162.385us    | 2.429s     | 15.23%      | 2.512s     | 508.913us    | 4936       |
+| ampere_bf16_s1688gemm_bf16_128x128_ldg8_f2f_stages_3... | 0.00% | 0.000us     | 0.00%       | 0.000us    | 0.000us      | 2.458s     | 15.42%      | 2.458s     | 1.490ms      | 1650       |
+| ampere_bf16_s1688gemm_bf16_128x128_ldg8_f2f_tn     | 0.00%      | 0.000us     | 0.00%       | 0.000us    | 0.000us      | 2.426s     | 15.21%      | 2.426s     | 1.154ms      | 2101       |
+| ampere_bf16_s16816gemm_bf16_128x64_ldg8_f2f_tn     | 0.00%      | 0.000us     | 0.00%       | 0.000us    | 0.000us      | 1.806s     | 11.32%      | 1.806s     | 1.806ms      | 1000       |
 
-| Name                                                    | Self CPU % | Self CPU   | CPU total % | CPU total  | CPU time avg | Self CUDA  | Self CUDA % | CUDA total | CUDA time avg | # of Calls |
-|---------------------------------------------------------|------------|------------|-------------|------------|---------------|------------|--------------|-------------|----------------|-------------|
-| model_inference                                         | 0.00%      | 0.000us    | 0.00%       | 0.000us    | 0.000us       | 93.961s    | 270.83%      | 93.961s     | 46.980s        | 2           |
-| model_inference                                         | 0.16%      | 146.259ms  | 100.00%     | 93.968s    | 93.968s       | 0.000us    | 0.00%        | 35.056s     | 35.056s        | 1           |
-| Torch-Compiled Region: 1/0                              | 0.95%      | 891.482ms  | 11.65%      | 10.943s    | 218.856ms     | 3.115s     | 8.98%        | 20.925s     | 418.491ms      | 50          |
-| InductorBenchmarker.benchmark_gpu (dynamo_timed)        | 0.00%      | 0.000us    | 0.00%       | 0.000us    | 0.000us       | 20.242s    | 58.35%       | 20.242s     | 55.764ms       | 363         |
-| Torch-Compiled Region: 2/0                              | 0.03%      | 30.361ms   | 14.19%      | 13.331s    | 13.331s       | 9.849s     | 28.39%       | 12.840s     | 12.840s        | 1           |
-| CachingAutotuner.benchmark_all_configs (dynamo_timed...)| 0.19%      | 174.454ms  | 22.95%      | 21.570s    | 209.413ms     | 0.000us    | 0.00%        | 6.794s      | 65.958ms       | 103         |
-| InductorBenchmarker.benchmark_gpu (dynamo_timed)        | 2.74%      | 2.576s     | 22.77%      | 21.395s    | 58.940ms      | 0.000us    | 0.00%        | 6.794s      | 18.715ms       | 363         |
-| aten::zero_                                             | 0.42%      | 398.503ms  | 1.60%       | 1.508s     | 21.568us      | 0.000us    | 0.00%        | 6.703s      | 95.887us       | 69905       |
-| aten::fill_                                             | 0.36%      | 341.773ms  | 1.18%       | 1.109s     | 17.078us      | 6.699s     | 19.31%       | 6.703s      | 103.204us      | 64949       |
-| void at::native::vectorized_elementwise_kernel<4, at... | 0.00%      | 0.000us    | 0.00%       | 0.000us    | 0.000us       | 6.699s     | 19.31%       | 6.699s      | 103.147us      | 64949       |
+**Self CPU time total: 24.556s**  
+**Self CUDA time total: 15.945s**
 
-**Self CPU time total: 93.968s**
-**Self CUDA time total: 34.694s**
+### Seventh Run (Using DDIM Sampler)
+
+| Name                                               | Self CPU % | Self CPU    | CPU total % | CPU total  | CPU time avg | Self CUDA  | Self CUDA % | CUDA total | CUDA time avg | # of Calls |
+|----------------------------------------------------|------------|-------------|-------------|------------|--------------|------------|-------------|------------|--------------|------------|
+| model_inference                                    | 0.00%      | 0.000us     | 0.00%       | 0.000us    | 0.000us      | 23.367s    | 152.38%     | 23.367s    | 11.684s      | 2          |
+| model_inference                                    | 0.52%      | 122.439ms   | 100.00%     | 23.373s    | 23.373s      | 0.000us    | 0.00%       | 15.547s    | 15.547s      | 1          |
+| Torch-Compiled Region: 1/0                         | 3.55%      | 830.407ms   | 17.21%      | 4.023s     | 80.464ms     | 578.596ms  | 3.77%       | 14.217s    | 284.334ms    | 50         |
+| aten::mm                                           | 1.03%      | 240.807ms   | 1.71%       | 399.772ms  | 51.670us     | 6.156s     | 40.14%      | 6.163s     | 796.556us    | 7737       |
+| aten::convolution                                  | 0.28%      | 65.346ms    | 3.84%       | 896.743ms  | 177.784us    | 0.000us    | 0.00%       | 2.359s     | 467.642us    | 5044       |
+| aten::_convolution                                 | 0.25%      | 58.523ms    | 3.47%       | 810.922ms  | 164.287us    | 0.000us    | 0.00%       | 2.359s     | 477.874us    | 4936       |
+| aten::cudnn_convolution                            | 1.59%      | 370.873ms   | 3.22%       | 752.399ms  | 152.431us    | 2.283s     | 14.89%      | 2.359s     | 477.874us    | 4936       |
+| ampere_bf16_s1688gemm_bf16_128x128_ldg8_f2f_stages_3... | 0.00% | 0.000us     | 0.00%       | 0.000us    | 0.000us      | 2.311s     | 15.07%      | 2.311s     | 1.401ms      | 1650       |
+| ampere_bf16_s1688gemm_bf16_128x128_ldg8_f2f_tn     | 0.00%      | 0.000us     | 0.00%       | 0.000us    | 0.000us      | 2.281s     | 14.88%      | 2.281s     | 1.086ms      | 2101       |
+| aten::_scaled_dot_product_flash_attention          | 0.13%      | 30.424ms    | 1.14%       | 267.038ms  | 162.629us    | 0.000us    | 0.00%       | 2.186s     | 1.331ms      | 1642       |
+
+**Self CPU time total: 23.373s**  
+**Self CUDA time total: 15.335s**
