@@ -1,6 +1,31 @@
-# Stable Diffusion Performance Analysis
+# Stable Diffusion From Scratch
 
-This repository contains performance measurements for Stable Diffusion model inference on an NVIDIA GeForce RTX 4060 GPU.
+This repository contains an implementation of Stable Diffusion built from scratch in PyTorch, with a focus on both understanding the architecture and optimizing its performance.
+
+## Project Overview
+
+This project implements the complete Stable Diffusion pipeline, including:
+
+- UNet with cross-attention for the diffusion model
+- CLIP text encoder for prompt processing
+- Variational Autoencoder (VAE) for image encoding/decoding
+- Various sampling methods for the diffusion process
+
+The implementation provides not only a functional model but also serves as an educational resource to understand how Stable Diffusion works internally.
+
+## Optimizations Implemented
+
+Throughout the development, several optimization techniques were explored to improve performance:
+
+1. **PyTorch Compile** - Using `torch.compile()` to apply JIT optimizations
+2. **Flash Attention** - Implementing efficient attention mechanism
+3. **Inference Mode** - Using `torch.inference_mode()` instead of `torch.no_grad()`
+4. **Mixed Precision** - Supporting BF16 and FP16 computations
+5. **DDIM Sampling** - Faster sampling with fewer inference steps
+
+## Performance Analysis
+
+The following benchmarks showcase the performance improvements achieved through various optimization techniques on an NVIDIA GeForce RTX 4060 GPU.
 
 ## System Specifications
 ```
@@ -114,8 +139,8 @@ Below are the performance measurements for various optimization approaches:
 | aten::bmm                                       | 1.05%      | 1.013s    | 1.12%        | 1.080s     | 327.956us      | 45.040s    | 52.78%        | 45.453s     | 13.803ms        | 3293        |
 | void cutlass::Kernel2<cutlass_80_tensorop_f16_s16816...| 0.00%      | 0.000us   | 0.00%        | 0.000us    | 0.000us        | 23.715s    | 27.79%        | 23.715s     | 94.859ms        | 250         |
 | triton_red_fused__softmax_14                   | 0.00%      | 3.748ms   | 0.01%        | 8.529ms    | 34.116us       | 23.662s    | 27.73%        | 23.662s     | 94.647ms        | 250         |
-| triton_red_fused__softmax_14                   | 0.00%      | 0.000us   | 0.00%        | 0.000us    | 0.000us        | 23.662s    | 27.73%        | 23.662s     | 94.647ms        | 250         |
-| ampere_fp16_s16816gemm_fp16_128x64_ldg8_f2f_nn  | 0.00%      | 0.000us   | 0.00%        | 0.000us    | 0.000us        | 21.127s    | 24.76%        | 21.127s     | 84.510ms        | 250         |
+| triton_red_fused__softmax_14                   | 0.00%      | 0.000us   | 0.00%        | 0.000us    | 0.000us      | 23.662s    | 27.73%        | 23.662s     | 94.647ms        | 250         |
+| ampere_fp16_s16816gemm_fp16_128x64_ldg8_f2f_nn  | 0.00%      | 0.000us   | 0.00%        | 0.000us    | 0.000us      | 21.127s    | 24.76%        | 21.127s     | 84.510ms        | 250         |
 | aten::mm                                        | 0.29%      | 284.905ms | 0.52%        | 499.538ms  | 64.565us       | 6.585s     | 7.72%         | 6.585s      | 851.102us       | 7737        |
 | aten::convolution                               | 0.08%      | 79.102ms  | 1.55%        | 1.495s     | 296.430us      | 0.000us    | 0.00%         | 6.406s      | 1.270ms         | 5044        |
 
