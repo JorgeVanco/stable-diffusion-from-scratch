@@ -119,7 +119,7 @@ Below are the performance measurements for various optimization approaches:
 | aten::mm                                        | 0.29%      | 284.905ms | 0.52%        | 499.538ms  | 64.565us       | 6.585s     | 7.72%         | 6.585s      | 851.102us       | 7737        |
 | aten::convolution                               | 0.08%      | 79.102ms  | 1.55%        | 1.495s     | 296.430us      | 0.000us    | 0.00%         | 6.406s      | 1.270ms         | 5044        |
 
-**Self CPU time total: 96.672s**
+**Self CPU time total: 96.672s**  
 **Self CUDA time total: 85.332s**
 
 ### Sixth Run (Using pytorch FlashAttention with bloat16)
@@ -156,3 +156,4 @@ Below are the performance measurements for various optimization approaches:
 
 **Self CPU time total: 23.373s**  
 **Self CUDA time total: 15.335s**
+
