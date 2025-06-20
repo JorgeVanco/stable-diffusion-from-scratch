@@ -182,3 +182,11 @@ Below are the performance measurements for various optimization approaches:
 **Self CPU time total: 23.373s**  
 **Self CUDA time total: 15.335s**
 
+## Conclusion
+
+The combination of all optimizations resulted in a dramatic performance improvement:
+- Initial run time: **465.378s**
+- Final run time (with all optimizations): **15.335s**
+
+This represents a **30.35x speedup** in inference time, making image generation significantly more practical on consumer hardware. The most effective optimization was the combination of PyTorch Flash Attention with bfloat16 precision and DDIM sampling, which significantly reduced memory usage and computational requirements without compromising image quality.
+
